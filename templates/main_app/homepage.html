@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block content %}
+
+<div class="with-title">
+    <h1 class="title">Upload File</h1>
+    {% if messages %}
+    {% for msg in messages %}
+    {% if msg.tags == "success" %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    <div class="box">
+        <form class="form-group" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h6 class="form-title">Select a file</h6>
+            <label class="btn btn-outline-dark btn-sm">Browse
+                {{ form.docfile }}
+            </label>
+            <span class="filename in-jquery">IN INDEX.JS</span>
+            <p class="help-text">make sure it's in the right format!</p>
+            {% if messages %}
+            {% for msg in messages %}
+            {% if msg.tags == "error" %}
+            <p><code> {{msg}} </code></p>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            <button type="submit" class="btn btn-secondary bottom-btn">Upload</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- <div class="with-title">
+    <h1 class="title">Upload File</h1>
+    <div class="box">
+        <form class="form-group form-group-sm" method="POST" action="/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h5 class="select-title">Select a file</h5>
+            <div class="input-group input-group-sm">
+                <label class="input-group-btn">
+                    <span class="btn btn-outline-dark btn-sm">
+                        Browse&hellip; <input type="file" name="docfile" style="display: none;" multiple>
+                    </span>
+                </label>
+                <input type="text" class="file-name-input" readonly>
+            </div>
+            <div>
+                <p class="help-block">
+                    Make sure it's in the right format
+                </p>
+            </div>
+            <button type="submit" class="btn btn-outline-dark btn-sm">Upload</button>
+        </form>
+    </div>
+</div>

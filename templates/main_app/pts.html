@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Points{% endblock %}
+
+{% block content %}
+<div class="with-title">
+    <h1 class="title">Points</h1>
+    <div class="box">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                {% for header in headers %}
+                <th scope="col">{{ header }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for line_lst in doclines %}
+            <tr>
+                {% for line in line_lst %}
+                <td>{{ line }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary bottom-btn">Calculate Links</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

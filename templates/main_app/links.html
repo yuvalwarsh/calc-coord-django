@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters_jinja %}
+
+{% block title %}Links{% endblock %}
+
+{% block content %}
+<div class="with-title">
+    <h1 class="title">Links</h1>
+    <div class="box">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">FROM</th>
+                <th scope="col">TO</th>
+                <th scope="col">DISTANCE [km]</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for key, value in links.items %}
+            <tr>
+                <td>{{ key | src_from_keys }}</td>
+                <td>{{ key | dst_from_keys }}</td>
+                <td>{{ value | value_from_key:"DISTANCE" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <a class="btn btn-secondary bottom-btn" href="{% url 'homepage' %}">Upload another CSV</a>
+    </div>
+</div>
+
+{% endblock %}
