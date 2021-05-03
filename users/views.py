@@ -1,29 +1,28 @@
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.shortcuts import render, redirect, HttpResponseRedirect, reverse
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django import forms
 from .forms import UserRegisterForm
 from django.contrib.auth import views as auth_views
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+class RegisterView(SuccessMessageMixin, CreateView):
+    template_name = 'users/register.html'
+    success_url = reverse_lazy('homepage')
+    form_class = UserRegisterForm
+    success_message = "Your profile was created successfully"
 
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for "{username}"')
-            return redirect('login')
+    def form_valid(self, form):
+        valid = super(RegisterView, self).form_valid(form)
+        user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
+        login(self.request, user)
 
-    else:
-        if request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('homepage'))
-
-        else:
-            form = UserRegisterForm()
-            return render(request, "users/register.html", {'form': form})
+        return valid
 
 
 class LoginFormView(SuccessMessageMixin, auth_views.LoginView):
