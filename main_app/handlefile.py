@@ -27,7 +27,7 @@ class HandleFile:
     def calc_links(docfile, uuid):
         # Not a DEV-SERVER
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            aws_key = os.environ['AWS_ACCESS_KEY']
+            aws_key = os.environ['AWS_ACCESS_KEY_ID']
             aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
             bucket_name = 'calc-coord-django-files-bucket'
