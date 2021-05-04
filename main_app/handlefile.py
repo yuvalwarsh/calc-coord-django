@@ -59,8 +59,16 @@ class HandleFile:
                 links_df.loc[idx, "DISTANCE"] = 'N/A'
 
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
+            aws_key = os.environ['AWS_ACCESS_KEY_ID']
+            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+
+            bucket_name = 'calc-coord-django-files-bucket'
+            object_key = docfile.name
+
+            path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
+
             s3 = boto3.resource(service_name='s3')
-            s3.meta.client.upload_file(Filename=docfile.name, Bucket='calc-coord-django-files-bucket',
+            s3.meta.client.upload_file(Filename=path, Bucket='calc-coord-django-files-bucket',
                                        Key=f'links/{uuid}')
 
         else:
