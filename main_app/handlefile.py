@@ -45,8 +45,7 @@ class HandleFile:
             for j in range(len(df.index) - i - 1):
                 links.append((df["POINT"][i], df["POINT"][j + i + 1]))
 
-        links_df = pd.DataFrame(columns=['DISTANCE'], index=links)
-
+        links_df = pd.DataFrame(columns=['DISTANCE'], index=pd.MultiIndex.from_tuples(links))
         for idx in links_df.index:
             lat1 = df[df["POINT"] == idx[0]]["LAT"].values[0]
             long1 = df[df["POINT"] == idx[0]]["LONG"].values[0]
