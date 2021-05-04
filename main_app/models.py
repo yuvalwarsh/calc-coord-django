@@ -9,7 +9,7 @@ import os
 
 def content_file_name(instance, filename):
     name, ext = filename.split('.')[:-1], filename.split('.')[-1]
-    filename = f'{name}_{instance.uuid}.{ext}
+    filename = f'{name}_{instance.uuid}.{ext}'
     return os.path.join('documents', filename)
 
 class Document(models.Model):
