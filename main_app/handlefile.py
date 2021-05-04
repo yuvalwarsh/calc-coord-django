@@ -1,6 +1,8 @@
 import json
 import os
 import re
+from io import BytesIO
+
 import pandas as pd
 from mpu import haversine_distance
 import sys
@@ -59,9 +61,15 @@ class HandleFile:
                 links_df.loc[idx, "DISTANCE"] = 'N/A'
 
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            s3 = boto3.resource(service_name='s3')
-            s3.meta.client.upload_file(links_df, Bucket='calc-coord-django-files-bucket',
-                                       Key=f'links/{uuid}')
+            bucket_name = 'calc-coord-django-files-bucket'
+            object_key = docfile.uuid
+
+            s3 = boto3.client('s3')
+
+            csv_buffer = BytesIO()
+            links_df.to_csv(csv_buffer, compression='gzip')
+
+            s3.upload_fileobj(csv_buffer, bucket_name, f'links/{object_key}')
 
         else:
             save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
