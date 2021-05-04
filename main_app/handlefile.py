@@ -63,7 +63,7 @@ class HandleFile:
             object_key = uuid
 
             s3 = boto3.client('s3')
-            with open(docfile.path, "rb") as f:
+            with open(docfile.name, "rb") as f:
                 s3.upload_fileobj(f, bucket_name, object_key)
 
         else:
