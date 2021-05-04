@@ -12,6 +12,7 @@ def content_file_name(instance, filename):
     filename = f'{name}_{instance.uuid}.{ext}'
     return os.path.join('documents', filename)
 
+
 class Document(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     docfile = models.FileField(upload_to=content_file_name)

@@ -25,7 +25,7 @@ class HandleFile:
 
     @staticmethod
     def calc_links(docfile, uuid):
-        if 'runserver' in sys.argv:
+        if 'runserver' not in sys.argv:
             aws_key = os.environ['AWS_ACCESS_KEY']
             aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
@@ -58,9 +58,10 @@ class HandleFile:
             except ValueError:
                 links_df.loc[idx, "DISTANCE"] = 'N/A'
 
-        if 'runserver' in sys.argv:
+        if 'runserver' not in sys.argv:
             s3 = boto3.resource(service_name='s3')
-            s3.meta.client.upload_file(Filename=docfile.path, Bucket='calc-coord-django-files-bucket', Key=f'{docfile.name}_{uuid}')
+            s3.meta.client.upload_file(Filename=docfile.path, Bucket='calc-coord-django-files-bucket',
+                                       Key=f'{docfile.name}_{uuid}')
 
         else:
             save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
@@ -69,4 +70,3 @@ class HandleFile:
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
         return parsed
-

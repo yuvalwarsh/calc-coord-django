@@ -18,6 +18,7 @@ def home(request):
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             newdoc = Document(docfile=request.FILES['docfile'], user=request.user)
+
             if newdoc.in_format():
                 newdoc.save()
 
@@ -44,7 +45,7 @@ def pts(request, newdoc_uuid):
     if request.method == 'GET':
         with doc.docfile.open('r') as file_content:
             doclines = file_content.readlines()
-            doclines = [n.decode().split(",") for n in doclines]
+            doclines = [n.split(",") for n in doclines]
 
         return render(request, "main_app/pts.html", {'doclines': doclines[1:], 'headers': doclines[0]})
 
@@ -81,7 +82,7 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
             with doc.docfile.open('r') as file_content:
                 doclines = file_content.readlines()
-                doclines = [n.decode().split(",") for n in doclines]
+                doclines = [n.split(",") for n in doclines]
 
                 all_files.append({
                     "headers": doclines[0],
