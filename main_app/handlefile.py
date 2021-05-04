@@ -59,9 +59,12 @@ class HandleFile:
                 links_df.loc[idx, "DISTANCE"] = 'N/A'
 
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            s3 = boto3.resource(service_name='s3')
-            s3.meta.client.upload_file(Filename=docfile.name, Bucket='calc-coord-django-files-bucket',
-                                       Key=f'links/{uuid}')
+            bucket_name = 'calc-coord-django-files-bucket'
+            object_key = uuid
+
+            s3 = boto3.client('s3')
+            with open(docfile.path, "rb") as f:
+                s3.upload_fileobj(f, bucket_name, object_key)
 
         else:
             save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
