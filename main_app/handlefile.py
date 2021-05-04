@@ -60,8 +60,8 @@ class HandleFile:
 
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
             s3 = boto3.resource(service_name='s3')
-            s3.meta.client.upload_file(Filename=docfile.path, Bucket='calc-coord-django-files-bucket',
-                                       Key=f'{docfile.name}_{uuid}')
+            s3.meta.client.upload_file(Filename=docfile.name, Bucket='calc-coord-django-files-bucket',
+                                       Key=f'links/{uuid}')
 
         else:
             save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
