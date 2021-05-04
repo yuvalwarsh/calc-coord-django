@@ -3,6 +3,9 @@ import os
 import re
 import pandas as pd
 from mpu import haversine_distance
+import sys
+import boto3
+from smart_open import smart_open
 
 
 class HandleFile:
@@ -22,7 +25,19 @@ class HandleFile:
 
     @staticmethod
     def calc_links(docfile, uuid):
-        df = pd.read_csv(docfile.path)
+        if 'runserver' in sys.argv:
+            aws_key = os.environ['AWS_ACCESS_KEY']
+            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+
+            bucket_name = 'calc-coord-django-files-bucket'
+            object_key = docfile.name
+
+            path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
+
+            df = pd.read_csv(smart_open(path))
+
+        else:
+            df = pd.read_csv(docfile.path)
 
         links = []
         for i in range(len(df.index)):
@@ -43,8 +58,13 @@ class HandleFile:
             except ValueError:
                 links_df.loc[idx, "DISTANCE"] = 'N/A'
 
-        save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
-        links_df.to_csv(f"{save_to_path}")
+        if 'runserver' in sys.argv:
+            s3 = boto3.resource(service_name='s3')
+            s3.meta.client.upload_file(Filename=docfile.path, Bucket='calc-coord-django-files-bucket', Key=f'{docfile.name}_{uuid}')
+
+        else:
+            save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
+            links_df.to_csv(f"{save_to_path}")
 
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)

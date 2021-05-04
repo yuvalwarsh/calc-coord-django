@@ -7,9 +7,14 @@ from .handlefile import HandleFile
 import os
 
 
+def content_file_name(instance, filename):
+    name, ext = filename.split('.')[:-1], filename.split('.')[-1]
+    filename = f'{name}_{instance.uuid}.{ext}
+    return os.path.join('documents', filename)
+
 class Document(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    docfile = models.FileField(upload_to='documents/')
+    docfile = models.FileField(upload_to=content_file_name)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_created = models.DateTimeField(default=timezone.now)
 
