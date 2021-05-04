@@ -62,7 +62,7 @@ class HandleFile:
 
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
             bucket_name = 'calc-coord-django-files-bucket'
-            object_key = docfile.uuid
+            object_key = uuid
 
             s3 = boto3.client('s3')
 
