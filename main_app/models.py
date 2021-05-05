@@ -6,7 +6,7 @@ from django.utils import timezone
 from .handlefile import HandleFile
 import os
 import sys
-import boto3
+from boto.s3.connection import S3Connection, Bucket, Key
 
 
 def content_file_name(instance, filename):
@@ -41,19 +41,19 @@ class Document(models.Model):
             path_links = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links'
             path_pts = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents'
 
-            s3 = boto3.resource("s3")
+            conn = S3Connection(aws_key, aws_secret)
+
+            bucket = Bucket(conn, bucket_name)
 
             # No links were calculated for the file
             try:
-                obj = s3.Object(bucket_name, f'{path_links}/{self.uuid}')
-                obj.delete()
+                bucket.delete_key(f'{path_links}/{self.uuid}')
 
             except FileNotFoundError:
                 pass
 
             # no need to check because it is created by default
-            obj = s3.Object(bucket_name, f'{path_pts}/{self.docfile.name}_{self.uuid}')
-            obj.delete()
+            bucket.delete_key(f'{path_pts}/{self.docfile.name}_{self.uuid}')
 
         else:
             # No links were calculated for the file
