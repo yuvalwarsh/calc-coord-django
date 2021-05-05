@@ -50,7 +50,12 @@ def pts(request, newdoc_uuid):
     if request.method == 'GET':
         with doc.docfile.open('r') as file_content:
             doclines = file_content.readlines()
-            doclines = [n.decode().split(",") for n in doclines]
+
+            if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
+                doclines = [n.decode().split(",") for n in doclines]
+
+            else:
+                doclines = [n.split(",") for n in doclines]
 
         return render(request, "main_app/pts.html", {'doclines': doclines[1:], 'headers': doclines[0]})
 
@@ -107,7 +112,7 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             else:
                 with doc.docfile.open('r') as file_content:
                     doclines = file_content.readlines()
-                    doclines = [n.decode().split(",") for n in doclines]
+                    doclines = [n.split(",") for n in doclines]
 
                     all_files.append({
                         "headers": doclines[0],

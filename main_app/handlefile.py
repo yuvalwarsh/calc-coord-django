@@ -2,7 +2,6 @@ import json
 import os
 import re
 from io import BytesIO
-
 import pandas as pd
 from mpu import haversine_distance
 import sys
