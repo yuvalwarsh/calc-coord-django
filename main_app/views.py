@@ -1,6 +1,5 @@
 import os
 import sys
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -8,7 +7,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DeleteView
 from smart_open import smart_open
-
 from .models import Document
 from .forms import DocumentForm
 from django.contrib import messages
