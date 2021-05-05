@@ -81,7 +81,6 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
         for doc in all_docs:
             uuid = doc.uuid
-            path = doc.docfile.path
 
             with smart_open(doc.docfile.path, 'rb') as file_content:
                 doclines = file_content.readlines()
