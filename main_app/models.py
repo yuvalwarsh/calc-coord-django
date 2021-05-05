@@ -44,16 +44,19 @@ class Document(models.Model):
             conn = S3Connection(aws_key, aws_secret)
 
             bucket = Bucket(conn, bucket_name)
+            k = Key(bucket)
 
             # No links were calculated for the file
             try:
-                bucket.delete_key(f'{path_links}/{self.uuid}')
+                k.key = f'{path_links}/{self.uuid}'
+                bucket.delete_key(k)
 
             except FileNotFoundError:
                 pass
 
             # no need to check because it is created by default
-            bucket.delete_key(f'{path_pts}/{self.docfile.name}_{self.uuid}')
+            k.key = f'{path_pts}/{self.docfile.name}_{self.uuid}'
+            bucket.delete_key(k)
 
         else:
             # No links were calculated for the file
