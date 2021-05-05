@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DeleteView
+from smart_open import smart_open
+
 from .models import Document
 from .forms import DocumentForm
 from django.contrib import messages
@@ -80,7 +82,7 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         for doc in all_docs:
             uuid = doc.uuid
 
-            with doc.docfile.open('r') as file_content:
+            with smart_open(doc.docfile.path, 'rb') as file_content:
                 doclines = file_content.readlines()
                 doclines = [n.decode().split(",") for n in doclines]
 
@@ -89,6 +91,17 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
                     "points": doclines[1:],
                     "uuid": uuid
                 })
+
+
+            # with doc.docfile.open('r') as file_content:
+            #     doclines = file_content.readlines()
+            #     doclines = [n.decode().split(",") for n in doclines]
+            #
+            #     all_files.append({
+            #         "headers": doclines[0],
+            #         "points": doclines[1:],
+            #         "uuid": uuid
+            #     })
 
         page_size = self.get_paginate_by(all_files)
         if page_size:

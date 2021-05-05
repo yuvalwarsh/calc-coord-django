@@ -78,4 +78,3 @@ class HandleFile:
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
         return parsed
-
