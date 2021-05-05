@@ -6,4 +6,4 @@ class MainAppConfig(AppConfig):
     name = 'main_app'
 
     def ready(self):
-        import main_app.signals
+        import django_project.main_app.signals
