@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -81,8 +83,16 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
         for doc in all_docs:
             uuid = doc.uuid
+            # ---------------------------------------------
+            aws_key = os.environ['AWS_ACCESS_KEY_ID']
+            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-            with smart_open(doc.docfile.path, 'rb') as file_content:
+            bucket_name = 'calc-coord-django-files-bucket'
+            object_key = doc.docfile.name
+
+            path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
+
+            with smart_open(path, 'rb') as file_content:
                 doclines = file_content.readlines()
                 doclines = [n.decode().split(",") for n in doclines]
 
