@@ -5,6 +5,8 @@ import uuid
 from django.utils import timezone
 from .handlefile import HandleFile
 import os
+import sys
+import boto3
 
 
 def content_file_name(instance, filename):
@@ -29,14 +31,39 @@ class Document(models.Model):
         return HandleFile.calc_links(self.docfile, self.uuid)
 
     def delete(self, *args, **kwargs):
-        # No links were calculated for the file
-        try:
-            os.remove(os.path.join(settings.MEDIA_ROOT, "documents/links", str(f"{self.uuid}.csv")))
+        # Not a DEV-SERVER
+        if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
+            aws_key = os.environ['AWS_ACCESS_KEY_ID']
+            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-        except FileNotFoundError:
-            pass
+            bucket_name = 'calc-coord-django-files-bucket'
 
-        # no need to check because it is created by default
-        os.remove(os.path.join(settings.MEDIA_ROOT, self.docfile.name))
+            path_links = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links'
+            path_pts = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents'
+
+            s3 = boto3.resource("s3")
+
+            # No links were calculated for the file
+            try:
+                obj = s3.Object(bucket_name, f'{path_links}/{self.uuid}')
+                obj.delete()
+
+            except FileNotFoundError:
+                pass
+
+            # no need to check because it is created by default
+            obj = s3.Object(bucket_name, f'{path_pts}/{self.docfile.name}_{self.uuid}')
+            obj.delete()
+
+        else:
+            # No links were calculated for the file
+            try:
+                os.remove(os.path.join(settings.MEDIA_ROOT, "documents/links", str(f"{self.uuid}.csv")))
+
+            except FileNotFoundError:
+                pass
+
+            # no need to check because it is created by default
+            os.remove(os.path.join(settings.MEDIA_ROOT, self.docfile.name))
 
         return super(Document, self).delete(*args, **kwargs)
