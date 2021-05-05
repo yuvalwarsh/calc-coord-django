@@ -51,7 +51,7 @@ class Document(models.Model):
                 obj.delete()
 
             except FileNotFoundError:
-                pass
+                raise FileNotFoundError
 
             # no need to check because it is created by default
             obj = s3.Object(bucket_name, f'{path_pts}/{self.docfile.name}_{self.uuid}')
@@ -63,7 +63,7 @@ class Document(models.Model):
                 os.remove(os.path.join(settings.MEDIA_ROOT, "documents/links", str(f"{self.uuid}.csv")))
 
             except FileNotFoundError:
-                pass
+                raise FileNotFoundError
 
             # no need to check because it is created by default
             os.remove(os.path.join(settings.MEDIA_ROOT, self.docfile.name))
