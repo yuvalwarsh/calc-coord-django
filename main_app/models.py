@@ -50,13 +50,14 @@ class Document(models.Model):
                 obj = s3.Object(bucket_name, f'{path_links}/{self.uuid}')
                 obj.delete()
 
-            except FileNotFoundError:
+            except ValueError:
                 pass
 
             # no need to check because it is created by default
             obj = s3.Object(bucket_name, f'{path_pts}/{self.docfile.name}_{self.uuid}')
             obj.delete()
 
+        # RUN LOCALLY
         else:
             # No links were calculated for the file
             try:
