@@ -40,8 +40,8 @@ class Document(models.Model):
 
             session = boto3.Session(aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
 
-            path_links = '/documents/links'
-            path_pts = '/documents'
+            path_links = f's3://{bucket_name}/documents/links'
+            path_pts = f's3://{bucket_name}/documents'
 
             s3 = session.resource("s3")
 
@@ -50,7 +50,7 @@ class Document(models.Model):
                 obj = s3.Object(bucket_name, f'{path_links}/{self.uuid}')
                 obj.delete()
 
-            except ValueError:
+            except FileNotFoundError:
                 pass
 
             # no need to check because it is created by default
