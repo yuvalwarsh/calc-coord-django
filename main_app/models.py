@@ -20,7 +20,7 @@ class Document(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
 
     def __repr__(self):
-        return f"<uuid> {self.uuid}, <path> {self.docfile.path}"
+        return f"<uuid> {self.uuid}, <path> {self.docfile.name}"
 
     def in_format(self):
         return HandleFile.in_format(self.docfile)
