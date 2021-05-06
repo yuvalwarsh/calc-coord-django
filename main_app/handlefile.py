@@ -41,13 +41,13 @@ class HandleFile:
 
             df = pd.read_csv(smart_open(pts_path))
 
-            try:
-                links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1])
-                links_df.fillna('N/A', inplace=True)
-                links_exist = True
-
-            except FileNotFoundError:
-                links_exist = False
+            # try:
+            #     links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1])
+            #     links_df.fillna('N/A', inplace=True)
+            #     links_exist = True
+            #
+            # except FileNotFoundError:
+            #     links_exist = False
 
         else:
             df = pd.read_csv(docfile.path)
