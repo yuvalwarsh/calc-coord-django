@@ -68,7 +68,7 @@ class HandleFile:
             csv_buffer = BytesIO()
             links_df.to_csv(csv_buffer, compression='gzip')
 
-            s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}')
+            s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
 
         else:
             save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
