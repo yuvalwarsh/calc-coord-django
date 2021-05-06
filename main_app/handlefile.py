@@ -86,8 +86,9 @@ class HandleFile:
 
                 csv_buffer = BytesIO()
                 links_df.to_csv(csv_buffer, compression='gzip')
+                print(links_df)
 
-                s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
+                s3.upload_fileobj(links_df, bucket_name, f'documents/links/{object_key}.csv')
 
             else:
                 print(links_df.index)
