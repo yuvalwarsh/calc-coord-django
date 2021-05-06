@@ -28,7 +28,7 @@ class Document(models.Model):
         return HandleFile.in_format(self.docfile)
 
     def calc_links(self):
-        return HandleFile.calc_links(self.docfile, self.uuid)
+        return HandleFile.calc_links(self.docfile, str(self.uuid))
 
     # def delete(self, *args, **kwargs):
     #     # Not a DEV-SERVER
