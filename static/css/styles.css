@@ -6,12 +6,6 @@ html {
   position: relative;
 }
 
-media (max-width: 1000px) {
-    html {
-       min-height: 50%;
-    }
-}
-
 body {
     display: inline;
 }
