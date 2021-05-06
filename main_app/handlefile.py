@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from io import BytesIO
+from io import StringIO
 import pandas as pd
 from mpu import haversine_distance
 import sys
@@ -84,11 +84,13 @@ class HandleFile:
 
                 s3 = boto3.client('s3')
 
-                csv_buffer = BytesIO()
+                csv_buffer = StringIO()
                 links_df.to_csv(csv_buffer, compression='gzip')
                 print(links_df)
 
-                s3.upload_fileobj(links_df, bucket_name, f'documents/links/{object_key}.csv')
+                s3_resource = boto3.resource('s3')
+                s3_resource.Object(bucket_name, f'documents/links/{uuid}.csv').put(Body=csv_buffer.getvalue())
+                # s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
 
             else:
                 print(links_df.index)
