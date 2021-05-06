@@ -41,13 +41,13 @@ class HandleFile:
 
             df = pd.read_csv(smart_open(pts_path))
 
-            # try:
-            #     links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1])
-            #     links_df.fillna('N/A', inplace=True)
-            #     links_exist = True
-            #
-            # except FileNotFoundError:
-            #     links_exist = False
+            try:
+                links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1])
+                links_df.fillna('N/A', inplace=True)
+                links_exist = True
+
+            except FileNotFoundError:
+                links_exist = False
 
         else:
             df = pd.read_csv(docfile.path)
@@ -82,15 +82,12 @@ class HandleFile:
                 bucket_name = 'calc-coord-django-files-bucket'
                 object_key = uuid
 
-                s3 = boto3.client('s3')
-
                 csv_buffer = StringIO()
                 links_df.to_csv(csv_buffer, compression='gzip')
                 print(links_df)
 
                 s3_resource = boto3.resource('s3')
                 s3_resource.Object(bucket_name, f'documents/links/{uuid}.csv').put(Body=csv_buffer.getvalue())
-                # s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
 
             else:
                 print(links_df.index)
