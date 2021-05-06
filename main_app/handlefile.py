@@ -26,53 +26,74 @@ class HandleFile:
 
     @staticmethod
     def calc_links(docfile, uuid):
+        links_exist = False
+
         # Not a DEV-SERVER
         if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
             aws_key = os.environ['AWS_ACCESS_KEY_ID']
             aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
             bucket_name = 'calc-coord-django-files-bucket'
-            object_key = docfile.name
+            object_key = os.path.split(docfile.name)[-1]
 
-            path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
+            pts_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/{object_key}'
+            links_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
 
-            df = pd.read_csv(smart_open(path))
+            df = pd.read_csv(smart_open(pts_path))
+
+            try:
+                pd.read_csv(smart_open(links_path))
+                links_exist = True
+                links_df = pd.read_csv(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv', index_col=[0, 1])
+                links_df.fillna('N/A', inplace=True)
+
+            except FileNotFoundError:
+                links_exist = False
 
         else:
             df = pd.read_csv(docfile.path)
 
-        links = []
-        for i in range(len(df.index)):
-            for j in range(len(df.index) - i - 1):
-                links.append((df["POINT"][i], df["POINT"][j + i + 1]))
+            if os.path.isfile(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv'):
+                # no need to calculate links again
+                print("LINKS EXISTS")
+                links_exist = True
+                links_df = pd.read_csv(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv', index_col=[0, 1])
+                links_df.fillna('N/A', inplace=True)
 
-        links_df = pd.DataFrame(columns=['DISTANCE'], index=pd.MultiIndex.from_tuples(links))
-        for idx in links_df.index:
-            lat1 = df[df["POINT"] == idx[0]]["LAT"].values[0]
-            long1 = df[df["POINT"] == idx[0]]["LONG"].values[0]
-            lat2 = df[df["POINT"] == idx[1]]["LAT"].values[0]
-            long2 = df[df["POINT"] == idx[1]]["LONG"].values[0]
+        if not links_exist:
+            links = []
+            for i in range(len(df.index)):
+                for j in range(len(df.index) - i - 1):
+                    links.append((df["POINT"][i], df["POINT"][j + i + 1]))
 
-            try:
-                links_df.loc[idx, "DISTANCE"] = haversine_distance((lat1, long1), (lat2, long2))
+            links_df = pd.DataFrame(columns=['DISTANCE'], index=pd.MultiIndex.from_tuples(links))
+            for idx in links_df.index:
+                lat1 = df[df["POINT"] == idx[0]]["LAT"].values[0]
+                long1 = df[df["POINT"] == idx[0]]["LONG"].values[0]
+                lat2 = df[df["POINT"] == idx[1]]["LAT"].values[0]
+                long2 = df[df["POINT"] == idx[1]]["LONG"].values[0]
 
-            except ValueError:
-                links_df.loc[idx, "DISTANCE"] = 'N/A'
+                try:
+                    links_df.loc[idx, "DISTANCE"] = haversine_distance((lat1, long1), (lat2, long2))
 
-        if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            bucket_name = 'calc-coord-django-files-bucket'
-            object_key = uuid
+                except ValueError:
+                    links_df.loc[idx, "DISTANCE"] = 'N/A'
 
-            s3 = boto3.client('s3')
+            if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
+                bucket_name = 'calc-coord-django-files-bucket'
+                object_key = uuid
 
-            csv_buffer = BytesIO()
-            links_df.to_csv(csv_buffer, compression='gzip')
+                s3 = boto3.client('s3')
 
-            s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
+                csv_buffer = BytesIO()
+                links_df.to_csv(csv_buffer, compression='gzip')
 
-        else:
-            save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
-            links_df.to_csv(f"{save_to_path}")
+                s3.upload_fileobj(csv_buffer, bucket_name, f'documents/links/{object_key}.csv')
+
+            else:
+                print(links_df.index)
+                save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
+                links_df.to_csv(f"{save_to_path}")
 
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
