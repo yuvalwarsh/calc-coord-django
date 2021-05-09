@@ -3,7 +3,6 @@ import os
 import re
 from io import StringIO
 import pandas as pd
-from boto import config
 from mpu import haversine_distance
 import sys
 import boto3
