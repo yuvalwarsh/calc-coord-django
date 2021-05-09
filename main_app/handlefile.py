@@ -3,6 +3,7 @@ import os
 import re
 from io import StringIO
 import pandas as pd
+from django.http import HttpResponseRedirect
 from mpu import haversine_distance
 import sys
 import boto3
@@ -121,4 +122,4 @@ class HandleFile:
             ExpiresIn=48600,
         )
 
-        return url
+        return HttpResponseRedirect(url)
