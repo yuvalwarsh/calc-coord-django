@@ -113,5 +113,5 @@ class HandleFile:
                 'Bucket': bucket_name,
                 'Key': f'documents/links{uuid}.csv'
             },
-            expires=86400
+            ExpiresIn=86400
         )
