@@ -31,7 +31,7 @@ class Document(models.Model):
         return HandleFile.calc_links(self.docfile, str(self.uuid))
 
     def get_links_url_by_uuid(self):
-        return HandleFile.get_links_url_by_uuid(str(self.uuid))
+        return HandleFile.get_links_url_by_uuid(self.docfile, str(self.uuid))
 
     # def delete(self, *args, **kwargs):
     #     # Not a DEV-SERVER

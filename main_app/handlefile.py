@@ -102,7 +102,7 @@ class HandleFile:
         return parsed
 
     @staticmethod
-    def get_links_url_by_uuid(uuid):
+    def get_links_url_by_uuid(docfile, uuid):
         s3 = boto3.client('s3')
 
         bucket_name = 'calc-coord-django-files-bucket'
