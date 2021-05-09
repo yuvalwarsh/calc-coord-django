@@ -165,8 +165,7 @@ AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
-if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 LOGGING = {
     'version': 1,

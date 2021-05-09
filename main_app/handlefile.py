@@ -3,7 +3,6 @@ import os
 import re
 from io import StringIO
 import pandas as pd
-from django.http import HttpResponseRedirect
 from mpu import haversine_distance
 import sys
 import boto3
@@ -35,7 +34,7 @@ class HandleFile:
             aws_key = os.environ['AWS_ACCESS_KEY_ID']
             aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-            bucket_name = 'calc-coord-django-files-bucket'
+            bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
             object_key = os.path.split(docfile.name)[-1]
 
             pts_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/{object_key}'
@@ -82,7 +81,7 @@ class HandleFile:
                     links_df.loc[idx, "DISTANCE"] = 'N/A'
 
             if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-                bucket_name = 'calc-coord-django-files-bucket'
+                bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
                 object_key = uuid
 
                 csv_buffer = StringIO()
@@ -107,7 +106,7 @@ class HandleFile:
         aws_key = os.environ['AWS_ACCESS_KEY_ID']
         aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-        bucket_name = 'calc-coord-django-files-bucket'
+        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
 
         client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
 
@@ -122,4 +121,4 @@ class HandleFile:
             ExpiresIn=48600,
         )
 
-        return HttpResponseRedirect(url)
+        return url

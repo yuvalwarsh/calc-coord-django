@@ -75,27 +75,15 @@ class Document(models.Model):
     #     return super(Document, self).delete(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # Not a DEV-SERVER
-        if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            bucket_name = 'calc-coord-django-files-bucket'
+        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+        s3_resource = boto3.client("s3")
 
-            s3_resource = boto3.client("s3")
+        # No links were calculated for the file
+        try:
+            s3_resource.delete_object(Bucket=bucket_name, Key=f'documents/links/{str(self.uuid)}.csv')
 
-            # No links were calculated for the file
-            try:
-                s3_resource.delete_object(Bucket=bucket_name, Key=f'documents/links/{str(self.uuid)}.csv')
-
-            except FileNotFoundError:
-                pass
-
-        # RUN LOCALLY
-        else:
-            # No links were calculated for the file
-            try:
-                os.remove(os.path.join(settings.MEDIA_ROOT, "documents/links", str(f"{self.uuid}.csv")))
-
-            except FileNotFoundError:
-                pass
+        except FileNotFoundError:
+            pass
 
         # django-cleanup will delete the pts file
         return super(Document, self).delete(*args, **kwargs)

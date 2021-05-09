@@ -49,11 +49,7 @@ def pts(request, newdoc_uuid):
         with doc.docfile.open('r') as file_content:
             doclines = file_content.readlines()
 
-            if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-                doclines = [n.decode().split(",") for n in doclines]
-
-            else:
-                doclines = [n.split(",") for n in doclines]
+            doclines = [n.decode().split(",") for n in doclines]
 
         return render(request, "main_app/pts.html", {'doclines': doclines[1:], 'headers': doclines[0]})
 
@@ -91,35 +87,23 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         for doc in all_docs:
             uuid = doc.uuid
 
-            if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-                aws_key = os.environ['AWS_ACCESS_KEY_ID']
-                aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+            aws_key = os.environ['AWS_ACCESS_KEY_ID']
+            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-                bucket_name = 'calc-coord-django-files-bucket'
-                object_key = doc.docfile.name
+            bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+            object_key = doc.docfile.name
 
-                path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
+            path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
 
-                with smart_open(path, 'rb') as file_content:
-                    doclines = file_content.readlines()
-                    doclines = [n.decode().split(",") for n in doclines]
+            with smart_open(path, 'rb') as file_content:
+                doclines = file_content.readlines()
+                doclines = [n.decode().split(",") for n in doclines]
 
-                    all_files.append({
-                        "headers": doclines[0],
-                        "points": doclines[1:],
-                        "uuid": uuid
-                    })
-
-            else:
-                with doc.docfile.open('r') as file_content:
-                    doclines = file_content.readlines()
-                    doclines = [n.split(",") for n in doclines]
-
-                    all_files.append({
-                        "headers": doclines[0],
-                        "points": doclines[1:],
-                        "uuid": uuid
-                    })
+                all_files.append({
+                    "headers": doclines[0],
+                    "points": doclines[1:],
+                    "uuid": uuid
+                })
 
         page_size = self.get_paginate_by(all_files)
         if page_size:
