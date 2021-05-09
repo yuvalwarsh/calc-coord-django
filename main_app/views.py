@@ -69,6 +69,7 @@ def links(request, newdoc_uuid):
     print(list(json_links.keys())[0])
 
     links_url = doc.get_links_url_by_uuid()
+    print(links_url)
 
     return render(request, "main_app/links.html", {'links': json_links, 'url': links_url})
 
