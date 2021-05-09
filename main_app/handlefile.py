@@ -106,7 +106,7 @@ class HandleFile:
         aws_key = os.environ['AWS_ACCESS_KEY_ID']
         aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-        client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=config(aws_secret))
+        client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
         bucket_name = 'calc-coord-django-files-bucket'
 
         file_name = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
