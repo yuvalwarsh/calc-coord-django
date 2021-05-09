@@ -5,12 +5,12 @@ register = template.Library()
 
 @register.filter
 def src_from_keys(value):
-    return value.replace("(", "").replace(")", "").replace("'", "").split(",")[0]
+    return value.replace("(", "").replace(")", "").replace("'", "").split(",")[1]
 
 
 @register.filter
 def dst_from_keys(value):
-    return value.replace("(", "").replace(")", "").replace("'", "").split(",")[1]
+    return value.replace("(", "").replace(")", "").replace("'", "").split(",")[2]
 
 
 @register.filter

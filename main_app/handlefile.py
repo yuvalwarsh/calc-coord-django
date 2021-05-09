@@ -7,6 +7,7 @@ from mpu import haversine_distance
 import sys
 import boto3
 from smart_open import smart_open
+import random as r
 
 
 class HandleFile:
@@ -63,14 +64,15 @@ class HandleFile:
             links = []
             for i in range(len(df.index)):
                 for j in range(len(df.index) - i - 1):
-                    links.append((df["POINT"][i], df["POINT"][j + i + 1]))
+                    # random will handle end-case of non-unique point column (index)
+                    links.append((r.random(), df["POINT"][i], df["POINT"][j + i + 1]))
 
             links_df = pd.DataFrame(columns=['DISTANCE'], index=pd.MultiIndex.from_tuples(links))
             for idx in links_df.index:
-                lat1 = df[df["POINT"] == idx[0]]["LAT"].values[0]
-                long1 = df[df["POINT"] == idx[0]]["LONG"].values[0]
-                lat2 = df[df["POINT"] == idx[1]]["LAT"].values[0]
-                long2 = df[df["POINT"] == idx[1]]["LONG"].values[0]
+                lat1 = df[df["POINT"] == idx[1]]["LAT"].values[0]
+                long1 = df[df["POINT"] == idx[1]]["LONG"].values[0]
+                lat2 = df[df["POINT"] == idx[2]]["LAT"].values[0]
+                long2 = df[df["POINT"] == idx[2]]["LONG"].values[0]
 
                 try:
                     links_df.loc[idx, "DISTANCE"] = haversine_distance((lat1, long1), (lat2, long2))
@@ -94,6 +96,7 @@ class HandleFile:
                 save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
                 links_df.to_csv(f"{save_to_path}")
 
+        # hadn't we have the random - in non-unique index a value error would have been raised
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
         return parsed
