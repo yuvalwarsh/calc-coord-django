@@ -3,7 +3,6 @@ import os
 import re
 from io import StringIO
 import pandas as pd
-from botocore.config import Config
 from mpu import haversine_distance
 import sys
 import boto3
@@ -107,9 +106,9 @@ class HandleFile:
         aws_key = os.environ['AWS_ACCESS_KEY_ID']
         aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-        bucket_name = Config('calc-coord-django-files-bucket')
+        bucket_name = 'calc-coord-django-files-bucket'
 
-        client = boto3.client('s3', aws_access_key_id=Config(aws_key), aws_secret_access_key=Config(aws_secret))
+        client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
 
         file_name = f'documents/links/{uuid}.csv'
 
@@ -121,4 +120,5 @@ class HandleFile:
             },
             ExpiresIn=48600,
         )
+
         return url
