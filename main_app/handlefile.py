@@ -110,4 +110,4 @@ class HandleFile:
 
         s3 = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
 
-        s3.download_file(bucket_name, f'documents/links/{uuid}.csv', f'/Users/username/Desktop/links_{uuid}.csv')
+        s3.download_file(bucket_name, f'documents/links/{uuid}.csv', f'/Users/user/Desktop/links_{uuid}.csv')
