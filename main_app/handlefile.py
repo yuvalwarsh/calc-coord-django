@@ -115,3 +115,4 @@ class HandleFile:
             },
             ExpiresIn=86400
         )
+        return url
