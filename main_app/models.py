@@ -30,6 +30,9 @@ class Document(models.Model):
     def calc_links(self):
         return HandleFile.calc_links(self.docfile, str(self.uuid))
 
+    def get_links_url_by_uuid(self):
+        return HandleFile.get_links_url_by_uuid(str(self.uuid))
+
     # def delete(self, *args, **kwargs):
     #     # Not a DEV-SERVER
     #     if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):

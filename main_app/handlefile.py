@@ -57,7 +57,7 @@ class HandleFile:
                 # no need to calculate links again
                 print("LINKS EXISTS")
                 links_exist = True
-                links_df = pd.read_csv(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv', index_col=[0, 1])
+                links_df = pd.read_csv(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv', index_col=[0, 1, 2])
                 links_df.fillna('N/A', inplace=True)
 
         if not links_exist:
@@ -96,7 +96,22 @@ class HandleFile:
                 save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
                 links_df.to_csv(f"{save_to_path}")
 
-        # hadn't we have the random - in non-unique index a value error would have been raised
+        # hadn't we called the random method - in non-unique index a value error would have been raised
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
         return parsed
+
+    @staticmethod
+    def get_links_url_by_uuid(uuid):
+        s3 = boto3.client('s3')
+
+        bucket_name = 'calc-coord-django-files-bucket'
+        # Generate the URL to get 'key-name' from 'bucket-name'
+        url = s3.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': f'documents/links{uuid}.csv'
+            },
+            expires=86400
+        )
