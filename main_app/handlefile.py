@@ -4,7 +4,6 @@ import re
 from io import StringIO
 import pandas as pd
 from mpu import haversine_distance
-import sys
 import boto3
 from smart_open import smart_open
 import random as r
@@ -29,36 +28,28 @@ class HandleFile:
     def calc_links(docfile, uuid):
         links_exist = False
 
-        # Not a DEV-SERVER
-        if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-            aws_key = os.environ['AWS_ACCESS_KEY_ID']
-            aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+        aws_key = os.environ['AWS_ACCESS_KEY_ID']
+        aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-            bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-            object_key = os.path.split(docfile.name)[-1]
+        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+        object_key = os.path.split(docfile.name)[-1]
 
-            pts_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/{object_key}'
-            links_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
+        pts_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/{object_key}'
+        links_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
 
-            df = pd.read_csv(smart_open(pts_path))
+        df = pd.read_csv(smart_open(pts_path))
 
-            # try:
-            #     links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1])
-            #     links_df.fillna('N/A', inplace=True)
-            #     links_exist = True
-            #
-            # except FileNotFoundError:
-            #     links_exist = False
+        try:
+            print("LINKS ALREADY EXISTS")
+            links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1, 2])
+            links_df.fillna('N/A', inplace=True)
+            links_exist = True
 
-        else:
-            df = pd.read_csv(docfile.path)
+        except OSError:
+            pass
 
-            if os.path.isfile(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv'):
-                # no need to calculate links again
-                print("LINKS EXISTS")
-                links_exist = True
-                links_df = pd.read_csv(f'{os.path.split(docfile.path)[0]}/links/{uuid}.csv', index_col=[0, 1, 2])
-                links_df.fillna('N/A', inplace=True)
+        except FileNotFoundError:
+            links_exist = False
 
         if not links_exist:
             links = []
@@ -80,45 +71,39 @@ class HandleFile:
                 except ValueError:
                     links_df.loc[idx, "DISTANCE"] = 'N/A'
 
-            if not (len(sys.argv) > 1 and sys.argv[1] == 'runserver'):
-                bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-                object_key = uuid
+            bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+            object_key = uuid
 
-                csv_buffer = StringIO()
-                links_df.to_csv(csv_buffer, compression='gzip')
-                print(links_df)
+            csv_buffer = StringIO()
+            links_df.to_csv(csv_buffer, compression='gzip')
+            print(links_df)
 
-                s3_resource = boto3.resource('s3')
-                s3_resource.Object(bucket_name, f'documents/links/{uuid}.csv').put(Body=csv_buffer.getvalue())
-
-            else:
-                print(links_df.index)
-                save_to_path = f"{os.path.split(docfile.path)[0]}/links/{uuid}.csv"
-                links_df.to_csv(f"{save_to_path}")
+            s3_resource = boto3.resource('s3')
+            s3_resource.Object(bucket_name, f'documents/links/{uuid}.csv').put(Body=csv_buffer.getvalue())
 
         # hadn't we called the random method - in non-unique index a value error would have been raised
         result = links_df.to_json(orient="index")
         parsed = json.loads(result)
         return parsed
 
-    @staticmethod
-    def get_links_url_by_uuid(docfile, uuid):
-        aws_key = os.environ['AWS_ACCESS_KEY_ID']
-        aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
-
-        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-
-        client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
-
-        file_name = f'documents/links/{uuid}.csv'
-
-        url = client.generate_presigned_url(
-            'get_object',
-            Params={
-                'Bucket': bucket_name,
-                'Key': file_name,
-            },
-            ExpiresIn=48600,
-        )
-
-        return url
+    # @staticmethod
+    # def get_links_url_by_uuid(docfile, uuid):
+    #     aws_key = os.environ['AWS_ACCESS_KEY_ID']
+    #     aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+    #
+    #     bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+    #
+    #     client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
+    #
+    #     file_name = f'documents/links/{uuid}.csv'
+    #
+    #     url = client.generate_presigned_url(
+    #         'get_object',
+    #         Params={
+    #             'Bucket': bucket_name,
+    #             'Key': file_name,
+    #         },
+    #         ExpiresIn=48600,
+    #     )
+    #
+    #     return url

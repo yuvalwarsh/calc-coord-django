@@ -23,6 +23,7 @@ def home(request):
             newdoc = Document(docfile=request.FILES['docfile'], user=request.user)
 
             if newdoc.in_format():
+                print(os.environ['AWS_STORAGE_BUCKET_NAME'])
                 newdoc.save()
 
                 # Redirect to the document list after POST
@@ -64,10 +65,10 @@ def links(request, newdoc_uuid):
     json_links = doc.calc_links()
     print(list(json_links.keys())[0])
 
-    links_url = doc.get_links_url_by_uuid()
-    print(links_url)
+    # links_url = doc.get_links_url_by_uuid()
+    # print(links_url)
 
-    return render(request, "main_app/links.html", {'links': json_links, 'url': links_url})
+    return render(request, "main_app/links.html", {'links': json_links})
 
 
 class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -90,7 +91,7 @@ class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             aws_key = os.environ['AWS_ACCESS_KEY_ID']
             aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
-            bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+            bucket_name = os.environ.get('AWS_STORAGE_BUCKET_NAME')
             object_key = doc.docfile.name
 
             path = f's3://{aws_key}:{aws_secret}@{bucket_name}/{object_key}'
