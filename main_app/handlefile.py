@@ -3,6 +3,7 @@ import os
 import re
 from io import StringIO
 import pandas as pd
+from boto import config
 from mpu import haversine_distance
 import sys
 import boto3
@@ -103,16 +104,21 @@ class HandleFile:
 
     @staticmethod
     def get_links_url_by_uuid(docfile, uuid):
-        s3 = boto3.client('s3')
+        aws_key = os.environ['AWS_ACCESS_KEY_ID']
+        aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
 
+        client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=config(aws_secret))
         bucket_name = 'calc-coord-django-files-bucket'
-        # Generate the URL to get 'key-name' from 'bucket-name'
-        url = s3.generate_presigned_url(
-            ClientMethod='get_object',
+
+        file_name = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
+
+        url = client.generate_presigned_url(
+            'get_object',
             Params={
                 'Bucket': bucket_name,
-                'Key': f'documents/links{uuid}.csv'
+                'Key': file_name,
             },
             ExpiresIn=86400
         )
         return url
+
