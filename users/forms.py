@@ -21,7 +21,7 @@ class UserRegisterForm(UserCreationForm):
 
 class CleanedEmailPasswordResetForm(PasswordResetForm):
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data['email'].lower().replace("googlemail", "gmail")
         users = User.objects.filter(email=email)
         if not users:
             raise forms.ValidationError("This email is not signed")
