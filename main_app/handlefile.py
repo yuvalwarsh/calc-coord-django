@@ -88,7 +88,7 @@ class HandleFile:
         return parsed
 
     @staticmethod
-    def download_links_file(uuid):
+    def make_csv_for_download(uuid):
         aws_key = os.environ['AWS_ACCESS_KEY_ID']
         aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
         bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
@@ -100,4 +100,9 @@ class HandleFile:
         links_df.rename(columns={'Unnamed: 1': 'FROM', 'Unnamed: 2': 'TO', 'DISTANCE': 'DISTANCE [km]'}, inplace=True)
         print(links_df)
 
-        links_df.to_csv(f'{target_path}\links_{uuid}.csv', index=False)
+        return links_df
+
+    @staticmethod
+    def save_links_csv(site_response, links_df):
+        links_df.to_csv(path_or_buf=site_response, index=False)
+

@@ -3,7 +3,7 @@ import sys
 from .handlefile import HandleFile
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DeleteView
@@ -71,8 +71,14 @@ def links(request, newdoc_uuid):
 
 @login_required()
 def download_links_csv(request, newdoc_uuid):
-    HandleFile.download_links_file(newdoc_uuid)
-    return redirect(reverse("links", kwargs={"newdoc_uuid": newdoc_uuid}))
+    links_df = HandleFile.make_csv_for_download(newdoc_uuid)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename=links_{newdoc_uuid}.csv'
+
+    HandleFile.save_links_csv(response, links_df)
+
+    return response
 
 
 class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
