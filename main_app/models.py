@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 import uuid
 from django.utils import timezone
 from .handlefile import HandleFile
 import os
-import boto3
 
 
 def content_file_name(instance, filename):
@@ -30,15 +28,7 @@ class Document(models.Model):
         return HandleFile.calc_links(self.docfile, str(self.uuid))
 
     def delete(self, *args, **kwargs):
-        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-        s3_resource = boto3.client("s3")
-
-        # No links were calculated for the file
-        try:
-            s3_resource.delete_object(Bucket=bucket_name, Key=f'documents/links/{str(self.uuid)}.csv')
-
-        except FileNotFoundError:
-            pass
+        HandleFile.delete_file(uuid=str(self.uuid))
 
         # django-cleanup will delete the pts file
         return super(Document, self).delete(*args, **kwargs)

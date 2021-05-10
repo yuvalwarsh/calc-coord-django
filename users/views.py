@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, HttpResponseRedirect, reverse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django import forms
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, CleanedEmailPasswordResetForm
 from django.contrib.auth import views as auth_views
 from django.contrib.messages.views import SuccessMessageMixin
 
@@ -38,6 +38,7 @@ def logout_view(request):
 
 
 class CustomPasswordResetView(PasswordResetView):
+    form_class = CleanedEmailPasswordResetForm
     template_name = 'users/password_reset.html'
 
     def dispatch(self, *args, **kwargs):

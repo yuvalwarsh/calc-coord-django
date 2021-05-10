@@ -101,3 +101,15 @@ class HandleFile:
     def save_links_csv(site_response, links_df):
         links_df.to_csv(path_or_buf=site_response, index=False)
 
+
+    @staticmethod
+    def delete_file(uuid):
+        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+        s3_resource = boto3.client("s3")
+
+        # No links were calculated for the file
+        try:
+            s3_resource.delete_object(Bucket=bucket_name, Key=f'documents/links/{uuid}.csv')
+
+        except FileNotFoundError:
+            pass

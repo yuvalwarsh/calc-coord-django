@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 
 
 class UserRegisterForm(UserCreationForm):
@@ -16,4 +16,13 @@ class UserRegisterForm(UserCreationForm):
         users = User.objects.filter(email=email)
         if users:
             raise forms.ValidationError("This email is already signed")
+        return email.lower()
+
+
+class CleanedEmailPasswordResetForm(PasswordResetForm):
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        users = User.objects.filter(email=email)
+        if not users:
+            raise forms.ValidationError("This email is not signed")
         return email.lower()
