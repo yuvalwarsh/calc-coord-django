@@ -29,9 +29,6 @@ class Document(models.Model):
     def calc_links(self):
         return HandleFile.calc_links(self.docfile, str(self.uuid))
 
-    def get_links_url_by_uuid(self):
-        return HandleFile.get_links_url_by_uuid(self.docfile, str(self.uuid))
-
     def delete(self, *args, **kwargs):
         bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
         s3_resource = boto3.client("s3")

@@ -1,6 +1,6 @@
 import os
 import sys
-import boto3
+from .handlefile import HandleFile
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -71,14 +71,7 @@ def links(request, newdoc_uuid):
 
 @login_required()
 def download_links_csv(request, newdoc_uuid):
-    s3 = boto3.resource('s3')
-    bucket_name = s3.Bucket(os.environ['AWS_STORAGE_BUCKET_NAME'])
-
-    for s3_object in bucket_name.objects.all():
-        path, filename = os.path.split(s3_object.key)
-        if filename == f'{newdoc_uuid}.csv':
-            bucket_name.download_file(s3_object.key, f'links_{filename}')
-
+    HandleFile.download_links_file(newdoc_uuid)
     return redirect(reverse("links", kwargs={"newdoc_uuid": newdoc_uuid}))
 
 

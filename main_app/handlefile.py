@@ -88,24 +88,16 @@ class HandleFile:
         return parsed
 
     @staticmethod
-    def get_links_url_by_uuid(docfile, uuid):
-        pass
-        # aws_key = os.environ['AWS_ACCESS_KEY_ID']
-        # aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
-        #
-        # bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-        #
-        # client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
-        #
-        # file_name = f'documents/links/{uuid}.csv'
-        #
-        # url = client.generate_presigned_url(
-        #     'get_object',
-        #     Params={
-        #         'Bucket': bucket_name,
-        #         'Key': file_name,
-        #     },
-        #     ExpiresIn=86400,
-        # )
-        #
-        # return url
+    def download_links_file(uuid):
+        aws_key = os.environ['AWS_ACCESS_KEY_ID']
+        aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+        bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+        links_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
+
+        target_path = r"C:\Users\User\Downloads"
+
+        links_df = pd.read_csv(smart_open(links_path)).drop('Unnamed: 0', axis=1)
+        links_df.rename(columns={'Unnamed: 1': 'FROM', 'Unnamed: 2': 'TO', 'DISTANCE': 'DISTANCE [km]'}, inplace=True)
+        print(links_df)
+
+        links_df.to_csv(f'{target_path}/links_{uuid}.csv', index=False)
