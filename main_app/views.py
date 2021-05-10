@@ -71,9 +71,6 @@ def links(request, newdoc_uuid):
 
 @login_required()
 def download_links_csv(request, newdoc_uuid):
-    target_path = os.path.join(os.environ["HOMEPATH"], "Desktop")
-    print(target_path)
-
     s3 = boto3.resource('s3')
     bucket_name = s3.Bucket(os.environ['AWS_STORAGE_BUCKET_NAME'])
 
