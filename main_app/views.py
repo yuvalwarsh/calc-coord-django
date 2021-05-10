@@ -1,5 +1,6 @@
 import os
 import sys
+import boto3
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -65,10 +66,23 @@ def links(request, newdoc_uuid):
     json_links = doc.calc_links()
     print(list(json_links.keys())[0])
 
-    # links_url = doc.get_links_url_by_uuid()
-    # print(links_url)
+    return render(request, "main_app/links.html", {'links': json_links, 'uuid': newdoc_uuid})
 
-    return render(request, "main_app/links.html", {'links': json_links})
+
+@login_required()
+def download_links_csv(request, newdoc_uuid):
+    target_path = os.path.join(os.environ["HOMEPATH"], "Desktop")
+    print(target_path)
+
+    s3 = boto3.resource('s3')
+    bucket_name = s3.Bucket(os.environ['AWS_STORAGE_BUCKET_NAME'])
+
+    for s3_object in bucket_name.objects.all():
+        path, filename = os.path.split(s3_object.key)
+        if filename == f'{newdoc_uuid}.csv':
+            bucket_name.download_file(s3_object.key, f'links_{filename}')
+
+    return redirect(reverse("links", kwargs={"newdoc_uuid": newdoc_uuid}))
 
 
 class UserPointsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -154,3 +168,4 @@ class CustomDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+

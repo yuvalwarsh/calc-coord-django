@@ -3,6 +3,7 @@ import os
 import re
 from io import StringIO
 import pandas as pd
+from botocore.config import Config
 from mpu import haversine_distance
 import boto3
 from smart_open import smart_open
@@ -86,24 +87,25 @@ class HandleFile:
         parsed = json.loads(result)
         return parsed
 
-    # @staticmethod
-    # def get_links_url_by_uuid(docfile, uuid):
-    #     aws_key = os.environ['AWS_ACCESS_KEY_ID']
-    #     aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
-    #
-    #     bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
-    #
-    #     client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
-    #
-    #     file_name = f'documents/links/{uuid}.csv'
-    #
-    #     url = client.generate_presigned_url(
-    #         'get_object',
-    #         Params={
-    #             'Bucket': bucket_name,
-    #             'Key': file_name,
-    #         },
-    #         ExpiresIn=48600,
-    #     )
-    #
-    #     return url
+    @staticmethod
+    def get_links_url_by_uuid(docfile, uuid):
+        pass
+        # aws_key = os.environ['AWS_ACCESS_KEY_ID']
+        # aws_secret = os.environ['AWS_SECRET_ACCESS_KEY']
+        #
+        # bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
+        #
+        # client = boto3.client('s3', aws_access_key_id=aws_key, aws_secret_access_key=aws_secret)
+        #
+        # file_name = f'documents/links/{uuid}.csv'
+        #
+        # url = client.generate_presigned_url(
+        #     'get_object',
+        #     Params={
+        #         'Bucket': bucket_name,
+        #         'Key': file_name,
+        #     },
+        #     ExpiresIn=86400,
+        # )
+        #
+        # return url
