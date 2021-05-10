@@ -94,8 +94,6 @@ class HandleFile:
         bucket_name = os.environ['AWS_STORAGE_BUCKET_NAME']
         links_path = f's3://{aws_key}:{aws_secret}@{bucket_name}/documents/links/{uuid}.csv'
 
-        target_path = r"C:\Users\User\Downloads"
-
         links_df = pd.read_csv(smart_open(links_path)).drop('Unnamed: 0', axis=1)
         links_df.rename(columns={'Unnamed: 1': 'FROM', 'Unnamed: 2': 'TO', 'DISTANCE': 'DISTANCE [km]'}, inplace=True)
         print(links_df)

@@ -77,7 +77,7 @@ def download_links_csv(request, newdoc_uuid):
     response['Content-Disposition'] = f'attachment; filename=links_{newdoc_uuid}.csv'
 
     HandleFile.save_links_csv(response, links_df)
-
+    print("DOWNLOADED")
     return response
 
 
