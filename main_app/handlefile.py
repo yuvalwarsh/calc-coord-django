@@ -21,7 +21,6 @@ class HandleFile:
             headers = file_content.readlines()[0].decode()
 
             if re.search('POINT.*', headers) and re.search('LONG.*', headers) and re.search('LAT.*', headers):
-                print("true")
                 return True
             return False
 
@@ -41,7 +40,7 @@ class HandleFile:
         df = pd.read_csv(smart_open(pts_path))
 
         try:
-            print("LINKS ALREADY EXISTS")
+            # LINKS FILE ALREADY EXISTS
             links_df = pd.read_csv(smart_open(links_path), index_col=[0, 1, 2])
             links_df.fillna('N/A', inplace=True)
             links_exist = True
@@ -77,7 +76,6 @@ class HandleFile:
 
             csv_buffer = StringIO()
             links_df.to_csv(csv_buffer, compression='gzip')
-            print(links_df)
 
             s3_resource = boto3.resource('s3')
             s3_resource.Object(bucket_name, f'documents/links/{uuid}.csv').put(Body=csv_buffer.getvalue())
@@ -96,7 +94,6 @@ class HandleFile:
 
         links_df = pd.read_csv(smart_open(links_path)).drop('Unnamed: 0', axis=1)
         links_df.rename(columns={'Unnamed: 1': 'FROM', 'Unnamed: 2': 'TO', 'DISTANCE': 'DISTANCE [km]'}, inplace=True)
-        print(links_df)
 
         return links_df
 

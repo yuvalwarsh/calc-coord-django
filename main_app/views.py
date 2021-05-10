@@ -18,13 +18,11 @@ from django.core.paginator import Paginator
 @login_required
 def home(request):
     if request.method == 'POST':
-        print("POST")
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             newdoc = Document(docfile=request.FILES['docfile'], user=request.user)
 
             if newdoc.in_format():
-                print(os.environ['AWS_STORAGE_BUCKET_NAME'])
                 newdoc.save()
 
                 # Redirect to the document list after POST
@@ -35,7 +33,6 @@ def home(request):
                 return HttpResponseRedirect(reverse('homepage'))
 
     else:
-        print("GET")
         form = DocumentForm()
         context = {
             'form': form
@@ -64,7 +61,6 @@ def links(request, newdoc_uuid):
     doc = Document.objects.filter(uuid=newdoc_uuid).first()
 
     json_links = doc.calc_links()
-    print(list(json_links.keys())[0])
 
     return render(request, "main_app/links.html", {'links': json_links, 'uuid': newdoc_uuid})
 
@@ -77,7 +73,6 @@ def download_links_csv(request, newdoc_uuid):
     response['Content-Disposition'] = f'attachment; filename=links_{newdoc_uuid}.csv'
 
     HandleFile.save_links_csv(response, links_df)
-    print("DOWNLOADED")
     return response
 
 
