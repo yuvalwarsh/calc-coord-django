@@ -100,4 +100,4 @@ class HandleFile:
         links_df.rename(columns={'Unnamed: 1': 'FROM', 'Unnamed: 2': 'TO', 'DISTANCE': 'DISTANCE [km]'}, inplace=True)
         print(links_df)
 
-        links_df.to_csv(r'{target_path}/links.csv', index=False)
+        links_df.to_csv(f'{target_path}\links_{uuid}.csv', index=False)
